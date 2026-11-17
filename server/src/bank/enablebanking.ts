@@ -26,7 +26,7 @@ export class EnableBankingProvider implements BankProvider {
   static fromEnv(): EnableBankingProvider | null {
     const appId = process.env.ENABLE_BANKING_APP_ID;
     const keyPath = process.env.ENABLE_BANKING_KEY_PATH;
-    const redirect = process.env.ENABLE_BANKING_REDIRECT_URL ?? 'http://localhost:5173/bancos/callback';
+    const redirect = process.env.ENABLE_BANKING_REDIRECT_URL ?? 'https://charliecobo.github.io/bisy/callback.html';
     if (!appId || !keyPath || !fs.existsSync(keyPath)) return null;
     return new EnableBankingProvider(appId, fs.readFileSync(keyPath, 'utf8'), redirect);
   }

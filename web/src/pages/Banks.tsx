@@ -21,7 +21,7 @@ export default function Banks() {
   const connect = async (inst: Institution) => {
     setError(null);
     try {
-      const r = await api.post<{ url: string }>('/bank/connections', { institution: inst.name, country: inst.country });
+      const r = await api.post<{ url: string }>('/bank/connections', { institution: inst.name, country: inst.country, return_to: window.location.origin });
       window.location.href = r.url; // el banco te pide autorización (SCA) y vuelve a /bancos/callback
     } catch (e) {
       setError((e as Error).message);
@@ -76,7 +76,7 @@ export default function Banks() {
           </p>
           <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
             <li>Regístrate en <a href="https://enablebanking.com" target="_blank" rel="noreferrer">enablebanking.com</a> y crea una aplicación en modo <i>Production (restricted)</i>.</li>
-            <li>Como URL de redirección pon <code>http://localhost:5173/bancos/callback</code>.</li>
+            <li>Como URL de redirección pon <code>https://charliecobo.github.io/bisy/callback.html</code> (esa página te devuelve a tu Bisy local).</li>
             <li>Descarga la clave privada <code>.pem</code> y guárdala en la carpeta del proyecto (no se sube a GitHub).</li>
             <li>En el portal, vincula tus cuentas a la aplicación (requisito del modo gratuito).</li>
             <li>Copia <code>.env.example</code> a <code>.env</code> y rellena <code>ENABLE_BANKING_APP_ID</code> y <code>ENABLE_BANKING_KEY_PATH</code>. Reinicia Bisy.</li>

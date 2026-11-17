@@ -563,8 +563,10 @@ export function registerRoutes(r: Router, db: DB, opts: RouteOptions = {}) {
     res.json(await bank().listInstitutions(country));
   });
   r.post('/bank/connections', async (req, res) => {
-    const b = z.object({ institution: z.string().min(1), country: z.string().length(2).toUpperCase() }).parse(req.body);
-    res.status(201).json(await startConnection(db, bank(), b.institution, b.country));
+    const b = z
+      .object({ institution: z.string().min(1), country: z.string().length(2).toUpperCase(), return_to: z.string().optional() })
+      .parse(req.body);
+    res.status(201).json(await startConnection(db, bank(), b.institution, b.country, b.return_to));
   });
   r.post('/bank/callback', async (req, res) => {
     const b = z.object({ code: z.string().min(1), state: z.string().min(1) }).parse(req.body);

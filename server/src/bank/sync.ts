@@ -2,8 +2,18 @@ import type { DB } from '../schema.js';
 import { accountBalance, insertTransaction, matchCategory, HttpError } from '../finance.js';
 import type { BankProvider } from './provider.js';
 
-export async function startConnection(db: DB, provider: BankProvider, institution: string, country: string) {
-  const state = globalThis.crypto.randomUUID();
+/**
+ * Enable Banking solo acepta URLs de retorno https. El banco vuelve a
+ * https://charliecobo.github.io/bisy/callback.html, que reenvía a `returnTo` (tu Bisy local).
+ * `returnTo` viaja dentro de `state` y solo se permite localhost para evitar redirecciones abiertas.
+ */
+export function isLocalOrigin(origin: string) {
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+}
+
+export async function startConnection(db: DB, provider: BankProvider, institution: string, country: string, returnTo?: string) {
+  const origin = returnTo && isLocalOrigin(returnTo) ? returnTo : 'http://localhost:5173';
+  const state = `${globalThis.crypto.randomUUID()}~${btoa(origin).replace(/=+$/, '')}`;
   const { url, valid_until } = await provider.startAuth(institution, country, state);
   const r = db
     .prepare(

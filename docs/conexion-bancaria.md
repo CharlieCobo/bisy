@@ -19,14 +19,14 @@ Bisy puede importar movimientos automáticamente usando **open banking (PSD2)**.
 1. Crea una cuenta en <https://enablebanking.com> y entra en el *Control Panel → Applications*.
 2. Registra una aplicación nueva:
    - Entorno: **Production**. Sin contrato queda en modo *restricted*, que basta para tus propias cuentas.
-   - Redirect URL: `http://localhost:5173/bancos/callback`. Si usas `npm start`, pon `http://localhost:4000/bancos/callback` y cámbialo también en `.env`.
+   - Redirect URL: `https://charliecobo.github.io/bisy/callback.html`. Enable Banking solo acepta `https`, así que el banco vuelve a esa página pública, que solo reenvía el código de autorización a tu Bisy local (`localhost`). El código no sirve sin tu clave privada, que nunca sale de tu ordenador.
    - Al crearla se descarga la **clave privada** (`.pem`). Guárdala en la carpeta del proyecto, por ejemplo como `enablebanking.pem`. Nunca la subas a GitHub; `*.pem` ya está en `.gitignore`.
 3. En la aplicación, usa **"Link accounts"** para vincular tus cuentas (requisito del modo restricted).
 4. Copia `.env.example` a `.env` y rellena:
    ```
    ENABLE_BANKING_APP_ID=<id de la aplicación>
    ENABLE_BANKING_KEY_PATH=./enablebanking.pem
-   ENABLE_BANKING_REDIRECT_URL=http://localhost:5173/bancos/callback
+   ENABLE_BANKING_REDIRECT_URL=https://charliecobo.github.io/bisy/callback.html
    ```
 5. Reinicia Bisy (`npm run dev`), ve a **Bancos**, elige tu banco y autoriza.
 6. Al volver, elige para cada cuenta si crear una cuenta nueva en Bisy o vincularla a una existente. Se importan los últimos 90 días y el saldo inicial se ajusta para que coincida con el del banco.
