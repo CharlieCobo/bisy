@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/api.ts","./src/format.ts","./src/hooks.ts","./src/main.tsx","./src/components/ui.tsx","./src/pages/Accounts.tsx","./src/pages/Banks.tsx","./src/pages/Budget.tsx","./src/pages/Dashboard.tsx","./src/pages/Debts.tsx","./src/pages/Goals.tsx","./src/pages/Import.tsx","./src/pages/Settings.tsx","./src/pages/Transactions.tsx"],"version":"5.9.3"}
