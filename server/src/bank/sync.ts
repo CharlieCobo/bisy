@@ -1,10 +1,9 @@
-import crypto from 'node:crypto';
-import type { DB } from '../db.js';
+import type { DB } from '../schema.js';
 import { accountBalance, insertTransaction, matchCategory, HttpError } from '../finance.js';
 import type { BankProvider } from './provider.js';
 
 export async function startConnection(db: DB, provider: BankProvider, institution: string, country: string) {
-  const state = crypto.randomUUID();
+  const state = globalThis.crypto.randomUUID();
   const { url, valid_until } = await provider.startAuth(institution, country, state);
   const r = db
     .prepare(

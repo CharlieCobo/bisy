@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import type { Dashboard as D } from '../api';
+import { LOCAL_MODE, type Dashboard as D } from '../api';
 import { useApi } from '../hooks';
 import { money, monthLabel, pct, thisMonth } from '../format';
 import { BudgetBadge, Empty, ErrorBox, Meter, Money, MonthPicker } from '../components/ui';
@@ -26,7 +26,8 @@ export default function Dashboard() {
           Falta el tipo de cambio para {data.missing_rates.join(', ')}. Añádelo en <Link to="/ajustes">Ajustes</Link> para ver los totales correctos.
         </div>
       )}
-      {data && (
+      {data && data.accounts.length === 0 && <Welcome />}
+      {data && data.accounts.length > 0 && (
         <div className="stack">
           <div className="grid g-4">
             <Stat label="Patrimonio neto" value={money(data.net_worth.net, base)} hint={`Activos ${money(data.net_worth.assets, base)} · Deudas ${money(data.net_worth.debts, base)}`} />
@@ -313,6 +314,25 @@ function NetWorthChart({ data }: { data: D }) {
             <Area type="monotone" dataKey="total" name="Saldo" stroke="var(--accent)" strokeWidth={2} fill="url(#nw)" dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--surface)' }} />
           </AreaChart>
         </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
+function Welcome() {
+  return (
+    <div className="card stack" style={{ maxWidth: 680 }}>
+      <h2 style={{ fontSize: 18 }}>👋 Bienvenido a Bisy</h2>
+      <p style={{ margin: 0 }}>Empieza creando tus cuentas (por ejemplo, tu cuenta del banco en euros y tu cuenta en pesos) con el saldo que tienen hoy.</p>
+      {LOCAL_MODE && (
+        <p className="small muted" style={{ margin: 0 }}>
+          Tus datos se guardan solo en este dispositivo y no se envían a ningún sitio. ¿Quieres verla funcionando antes?
+          Carga datos de ejemplo desde <Link to="/ajustes">Ajustes → Tus datos</Link>.
+        </p>
+      )}
+      <div className="row">
+        <Link to="/cuentas"><button className="primary">Crear mi primera cuenta</button></Link>
+        <Link to="/ajustes"><button>Tipos de cambio</button></Link>
       </div>
     </div>
   );

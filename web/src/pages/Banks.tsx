@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { api, type Account } from '../api';
+import { api, LOCAL_MODE, type Account } from '../api';
 import { useApi } from '../hooks';
 import { ACCOUNT_TYPES } from '../format';
 import { Empty, ErrorBox } from '../components/ui';
@@ -57,7 +57,17 @@ export default function Banks() {
       {syncMsg && <div className="alert" style={{ marginBottom: 12 }}>{syncMsg}</div>}
       <ErrorBox error={error} />
 
-      {health && !health.bank_provider && (
+      {LOCAL_MODE && (
+        <div className="card stack" style={{ marginBottom: 16 }}>
+          <h2>No disponible en la versión web</h2>
+          <p style={{ margin: 0 }}>
+            Conectar con el banco necesita una clave privada que no puede guardarse en una página pública. Para eso hay que ejecutar Bisy
+            en tu ordenador (<code>npm run dev</code>, ver README). Mientras tanto, descarga el extracto de tu banco y súbelo en{' '}
+            <Link to="/importar">Importar CSV</Link>: los movimientos repetidos se ignoran.
+          </p>
+        </div>
+      )}
+      {!LOCAL_MODE && health && !health.bank_provider && (
         <div className="card stack" style={{ marginBottom: 16 }}>
           <h2>Configura la conexión bancaria</h2>
           <p style={{ margin: 0 }}>

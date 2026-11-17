@@ -1,5 +1,5 @@
-import type { DB } from './db.js';
-import { tx } from './db.js';
+import type { DB } from './schema.js';
+import { tx } from './schema.js';
 
 export type Kind = 'income' | 'expense' | 'transfer' | 'adjustment';
 

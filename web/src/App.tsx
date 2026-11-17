@@ -8,6 +8,7 @@ import Goals from './pages/Goals';
 import Import from './pages/Import';
 import Banks, { BankCallback } from './pages/Banks';
 import Settings from './pages/Settings';
+import { LOCAL_MODE } from './api';
 
 const NAV = [
   ['/', '📊', 'Panel'],
@@ -26,7 +27,7 @@ export default function App() {
     <div className="layout">
       <aside className="sidebar">
         <div className="brand">
-          <img src="/favicon.svg" alt="" /> Bisy
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" /> Bisy
         </div>
         <nav className="nav">
           {NAV.map(([to, ico, label]) => (
@@ -36,7 +37,9 @@ export default function App() {
             </NavLink>
           ))}
         </nav>
-        <div className="foot">Tus datos se guardan en local (SQLite).</div>
+        <div className="foot">
+          {LOCAL_MODE ? 'Tus datos se guardan solo en este dispositivo. Haz copias en Ajustes.' : 'Tus datos se guardan en local (SQLite).'}
+        </div>
       </aside>
       <main>
         <Routes>

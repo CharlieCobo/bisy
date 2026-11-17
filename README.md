@@ -17,7 +17,18 @@ Aplicación personal para controlar tus finanzas del día a día: cuentas en var
 | Ahorros | **Ahorros**: metas vinculadas a una cuenta o con aportaciones manuales |
 | Que los movimientos lleguen solos | **Bancos** (PSD2 vía Enable Banking) o **Importar CSV** como alternativa |
 
-## Puesta en marcha
+## Versión web (GitHub Pages)
+
+👉 **https://charliecobo.github.io/bisy/**
+
+Se publica sola con cada cambio en `main`. En esta versión **todo funciona dentro del navegador**: la misma lógica del servidor corre con SQLite en WebAssembly (sql.js) y los datos se guardan en IndexedDB **de ese dispositivo**. La página es pública, pero tus datos no salen de tu navegador.
+
+- **Copias de seguridad:** en *Ajustes → Tus datos* puedes descargar y restaurar una copia `.db`. Sirve también para pasar los datos de un dispositivo a otro, y es compatible con la versión de servidor.
+- **iPad/iPhone:** añádela a la pantalla de inicio (*Compartir → Añadir a pantalla de inicio*). Si no, Safari puede borrar los datos de webs que no visitas en 7 días.
+- **Sin conexión bancaria:** necesita una clave privada que no puede ir en una web pública. Usa *Importar CSV* o ejecuta la versión de servidor.
+- Para probarla en local: `npm run dev:pages -w web`.
+
+## Puesta en marcha (versión completa con servidor)
 
 Requisitos: **Node.js 22.13 o superior** (usa el SQLite integrado en Node, sin instalar base de datos).
 

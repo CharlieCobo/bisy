@@ -1,6 +1,5 @@
 import Papa from 'papaparse';
-import crypto from 'node:crypto';
-import type { DB } from './db.js';
+import type { DB } from './schema.js';
 import { insertTransaction, matchCategory, HttpError } from './finance.js';
 
 export type DateFormat = 'YYYY-MM-DD' | 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'DD-MM-YYYY';
@@ -143,7 +142,7 @@ export function importCsv(db: DB, accountId: number, text: string, mapping: CsvM
       const base = `${date}|${amount}|${description}`;
       const n = (seen.get(base) ?? 0) + 1;
       seen.set(base, n);
-      const external_id = 'csv:' + crypto.createHash('sha1').update(`${base}|${n}`).digest('hex').slice(0, 20);
+      const external_id = 'csv:' + stableHash(`${base}|${n}`);
       const id = insertTransaction(db, {
         account_id: accountId,
         date,
@@ -163,4 +162,27 @@ export function importCsv(db: DB, accountId: number, text: string, mapping: CsvM
     throw e;
   }
   return { imported, duplicates, errors, total: rows.length };
+}
+
+/** Hash estable (cyrb53) en JS puro, para que funcione igual en Node y en el navegador. */
+export function stableHash(str: string): string {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
+}
+
+/** Decodifica bytes como UTF-8 y, si no es válido, como Windows-1252/Latin-1 (habitual en bancos españoles). */
+export function decodeBytes(bytes: Uint8Array): string {
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    return new TextDecoder('windows-1252').decode(bytes);
+  }
 }

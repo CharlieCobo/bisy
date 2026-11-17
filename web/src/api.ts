@@ -4,7 +4,20 @@ export class ApiError extends Error {
   }
 }
 
+/** true en la versión web publicada (GitHub Pages): los datos viven en este navegador. */
+export const LOCAL_MODE = import.meta.env.VITE_LOCAL === '1';
+
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (LOCAL_MODE) {
+    const { handle } = await import('./local/localServer');
+    const { status, data } = await handle(method, path, body);
+    if (status >= 400) {
+      const issues = (data as any)?.issues as Array<{ path: string[]; message: string }> | undefined;
+      const detail = issues?.length ? `: ${issues.map((i) => `${i.path.join('.')} ${i.message}`).join(', ')}` : '';
+      throw new ApiError(status, ((data as any)?.error ?? 'Error') + detail, data);
+    }
+    return data as T;
+  }
   const isForm = body instanceof FormData;
   const res = await fetch(`/api${path}`, {
     method,

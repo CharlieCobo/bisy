@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api, type Category } from '../api';
+import { api, LOCAL_MODE, type Category } from '../api';
 import { useApi } from '../hooks';
 import { SERIES, dateLabel, today } from '../format';
 import { ErrorBox, Modal } from '../components/ui';
@@ -15,6 +15,7 @@ export default function Settings() {
       </div>
       <div className="grid g-2" style={{ alignItems: 'start' }}>
         <div className="stack">
+          {LOCAL_MODE && <LocalData />}
           <Rates />
           <Rules />
         </div>
@@ -175,6 +176,47 @@ function Categories() {
           </div>
         </Modal>
       )}
+    </div>
+  );
+}
+
+function LocalData() {
+  const [msg, setMsg] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const run = async (fn: () => Promise<void>, ok: string, reload = false) => {
+    setError(null);
+    try {
+      await fn();
+      setMsg(ok);
+      if (reload) setTimeout(() => window.location.reload(), 600);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+  const local = () => import('../local/localServer');
+  return (
+    <div className="card">
+      <div className="card-head"><h2>Tus datos</h2></div>
+      <p className="small muted" style={{ marginTop: -6 }}>
+        En esta versión web tus datos se guardan <b>solo en este navegador y dispositivo</b>; no se envían a ningún servidor.
+        Si borras los datos del navegador se pierden: descarga una copia de vez en cuando. Con esa copia puedes pasar tus datos a otro dispositivo.
+      </p>
+      <div className="row">
+        <button className="primary small" onClick={() => run(async () => (await local()).exportBackup(), 'Copia descargada.')}>⬇ Descargar copia</button>
+        <label className="btn small" style={{ cursor: 'pointer' }}>
+          ⬆ Restaurar copia
+          <input type="file" accept=".db,application/x-sqlite3,application/octet-stream" hidden onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f && window.confirm('Se sustituirán TODOS los datos actuales por los de la copia. ¿Continuar?'))
+              run(async () => (await local()).importBackup(f), 'Copia restaurada.', true);
+          }} />
+        </label>
+        <span className="spacer" />
+        <button className="small" onClick={() => window.confirm('Se borrarán tus datos y se cargarán datos de ejemplo. ¿Continuar?') && run(async () => (await local()).resetAll(true), 'Datos de ejemplo cargados.', true)}>Cargar ejemplo</button>
+        <button className="small danger" onClick={() => window.confirm('¿Borrar TODOS los datos de este dispositivo?') && run(async () => (await local()).resetAll(false), 'Datos borrados.', true)}>Borrar todo</button>
+      </div>
+      {msg && <div className="alert" style={{ marginTop: 10 }}>{msg}</div>}
+      <ErrorBox error={error} />
     </div>
   );
 }
