@@ -15,7 +15,7 @@ export default function Settings() {
       </div>
       <div className="grid g-2" style={{ alignItems: 'start' }}>
         <div className="stack">
-          {LOCAL_MODE && <LocalData />}
+          {LOCAL_MODE ? <LocalData /> : <ServerData />}
           <Rates />
           <Rules />
         </div>
@@ -217,6 +217,18 @@ function LocalData() {
       </div>
       {msg && <div className="alert" style={{ marginTop: 10 }}>{msg}</div>}
       <ErrorBox error={error} />
+    </div>
+  );
+}
+
+function ServerData() {
+  return (
+    <div className="card">
+      <div className="card-head"><h2>Tus datos</h2></div>
+      <p className="small muted" style={{ marginTop: -6 }}>
+        Descarga una copia de tu base de datos. Puedes restaurarla en la versión web (por ejemplo, en tu tablet) desde Ajustes → Tus datos.
+      </p>
+      <a className="btn small" href="/api/backup" download>⬇ Descargar copia</a>
     </div>
   );
 }
